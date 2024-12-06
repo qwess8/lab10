@@ -1,4 +1,4 @@
-// labor10.cpp: ���������� ����� ����� ��� ����������� ����������.
+﻿// labor10.cpp: определяет точку входа для консольного приложения.
 //
 
 #define _CRT_SECURE_NO_WARNINGS
@@ -8,15 +8,15 @@
 #include <queue> 
 using namespace std;
 
-int** createG(int size) {
+int** createGOW(int size) {
     int** G = (int**)malloc(size * sizeof(int*));
     for (int i = 0; i < size; i++) {
         G[i] = (int*)malloc(size * sizeof(int));
     }
     for (int i = 0; i < size; i++) {
-        for (int j = i; j < size; j++) {
+        for (int j = 0; j < size; j++) {
             G[i][j] =(rand()%2) ? 0 : rand() % 10;
-            G[j][i] = (i == j) ? 0 : G[i][j];
+            if(i==j) G[i][j] = 0;
         }
     }
     return G;
@@ -29,11 +29,19 @@ int** createGO(int size) {
     }
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            G[i][j] =(rand()%2) ? 0 : rand() % 10;
+            G[i][j] =rand()%2;
             if(i==j) G[i][j] = 0;
         }
     }
     return G;
+}
+
+void mirrorG(int** G, int size){
+	for (int i = 0; i < size; i++) {
+        for (int j = i; j < size; j++) {
+			G[i][j] =  G[j][i];
+		}
+	}
 }
  
 void printG(int** G, int size) {
@@ -102,19 +110,35 @@ void PerCen(int* exs, int rad, int diam, int size){
 
 
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, "Rus");
 	srand(time(NULL));
-    int nG = 5;
+    int nG = 5, weighted = 0, oriented = 0;
+	printf("Вы можете ввести размер(-n <знач>), ориентированность(-o) и взвешенность(-w) графа с помощью аргументов программы.\nПо умолчанию они заданы как размер = 5, неориентированный, невзвешанный.");
+	getchar();
+	if(argc > 1){
+		for (int i = 0; i < argc; i++) {
+			if(strcmp(argv[i], "-n")==0){
+				nG = atoi(argv[i+1]);
+				i++;
+			}
+			else if(strcmp(argv[i], "-w")==0) weighted = 1;
+			else if(strcmp(argv[i], "-o")==0) oriented = 1;
+		}
+	}
 	int* exs = (int*)malloc(nG * sizeof(int));
 	int** D = (int**)malloc(sizeof(int*) * nG);
 	for (int i = 0; i < nG; i++) {
         D[i] = (int*)malloc(nG * sizeof(int));
     }
-	int** G = createGO(nG);
+	int** G = NULL;
+	if(weighted) G = createGOW(nG);
+	else G = createGO(nG);
 
 	printG(G,nG);
+
+	if(!oriented) mirrorG(G, nG);
 
 	createD(G, nG, D, exs);
 	printf("\n");
