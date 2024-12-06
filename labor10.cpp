@@ -47,7 +47,8 @@ void mirrorG(int** G, int size){
 void printG(int** G, int size) {
     for (int i = 0; i < size; i++) {
         for (int j = 0; j < size; j++) {
-            printf("%2d ", G[i][j]);
+			if(G[i][j] != INT_MAX) printf("%2d ", G[i][j]);
+			else printf(" - ");
         }
         printf("\n");
     }
@@ -62,7 +63,7 @@ void DiFS(int** G, int size, int* dist, int s) {
         s = q.front();
         q.pop();
         for (int i = 0; i < size; i++) {
-            if (G[s][i] && dist[i]==-1) {
+            if (G[s][i] && dist[i]>dist[s] + G[s][i]) {
                 q.push(i);
                 dist[i] = dist[s] + G[s][i];
             }
@@ -74,11 +75,11 @@ void createD(int** G, int size, int** D, int* exs){
 	int* dist = (int*)malloc(sizeof(int) * size);
 	int max;
 	for(int i = 0; i < size; i++){
-		for(int j = 0; j < size; j++) dist[j] = -1;
+		for(int j = 0; j < size; j++) dist[j] = INT_MAX;
 		DiFS(G, size, dist, i);
-		max = dist[0];
+		max = INT_MIN;
 		for(int j = 0; j < size; j++){
-			if(max < dist[j]) max = dist[j];
+			if(max < dist[j] && dist[j]!=INT_MAX) max = dist[j];
 			D[i][j] = dist[j];
 		}
 		exs[i] = max;
@@ -114,9 +115,8 @@ int main(int argc, char* argv[])
 {
 	setlocale(LC_ALL, "Rus");
 	srand(time(NULL));
-    int nG = 5, weighted = 0, oriented = 0;
-	printf("Вы можете ввести размер(-n <знач>), ориентированность(-o) и взвешенность(-w) графа с помощью аргументов программы.\nПо умолчанию они заданы как размер = 5, неориентированный, невзвешанный.");
-	getchar();
+    int nG = 5, weighted = 1, oriented = 1;
+	printf("Вы можете ввести размер(-n <знач>), ориентированность(-o) и взвешенность(-w) графа с помощью аргументов программы.\nПо умолчанию они заданы как размер = 5, неориентированный, невзвешанный.\n");
 	if(argc > 1){
 		for (int i = 0; i < argc; i++) {
 			if(strcmp(argv[i], "-n")==0){
